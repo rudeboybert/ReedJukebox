@@ -77,8 +77,8 @@ Rage Against The Machine - 02 Killing in the Name            29  Otis Redding - 
 
 Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and song plays during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
 
-* Two error bars don't overlap, a two-sample test for a difference in means/proportion would yield a statistically significant difference.
-* Two error bars do overlap, a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
+* Two error bars don't overlap, then a two-sample test for a difference in means/proportion would yield a statistically significant difference.
+* Two error bars do overlap, then a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
 
 ![](README_files/figure-html/unnamed-chunk-6-1.png) 
 
