@@ -98,7 +98,7 @@ jukebox <- jukebox %>%
     acad.year = ifelse(date_time %within% acad.years[3], "2005-2006", acad.year),
     acad.year = ifelse(date_time %within% acad.years[4], "2006-2007", acad.year),
     acad.year = ifelse(date_time %within% acad.years[5], "2007-2008", acad.year),
-    acad.year = ifelse(date_time %within% acad.years[6], "2008-2009", acad.year)  
+    acad.year = ifelse(date_time %within% acad.years[6], "2008-2009", acad.year)
   )
 
 
@@ -301,7 +301,7 @@ bind_cols(SNB.songs, non.SNB.songs) %>%
 
 **********
 
-Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and song plays during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (code c/o Dean Young).  Note that if 
+Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and songs played during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (code c/o Dean Young).  Note that if 
 
 * Two error bars don't overlap, a two-sample test for a difference in means/proportion would yield a statistically significant difference.
 * Two error bars do overlap, a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
@@ -345,13 +345,4 @@ ggplot(data=top_ten, aes(x=artist, y=prop, fill=type)) +
 
 ## Background and Information
 
-This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim/) [MATH 241 Data Science](http://people.reed.edu/~albkim/MATH241/) class.  Students created all visualizations and conducted all analysis using the open source [R statistical language and environment](http://cran.r-project.org/) via the [RStudio interface](http://www.rstudio.com/).  Students later learned how to make similar interactive webapps to this one via the [Shiny](http://shiny.rstudio.com/) extension to R/RStudio without using any HTML, javascript, CSS, etc, but rather using R and the following packages (extensions to base R):
-
-* [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package for data manipulation
-* [ggplot](http://ggplot2.org/) package for data visualization, which is an implementation of [*The Grammar of Graphics*](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448)
-* [lubridate](http://cran.r-project.org/web/packages/lubridate/lubridate.pdf) packages for date/time/time zone processing.
-
-The materials from this class can be found at:
-
-* A [GitHub repository](https://github.com/rudeboybert/MATH241) of all code used and most data sets (some could not be shared for confidentialily reasons).  
-* Periodic slides and homework solutions on [RPubs](http://rpubs.com/rudeboybert).  All items marked "MATH 241" were relevant to this course.
+This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim/) [MATH 241 Data Science](http://people.reed.edu/~albkim/MATH241/) class.  Students created all visualizations and conducted all analysis using the open source [R statistical language and environment](http://cran.r-project.org/) via the [RStudio interface](http://www.rstudio.com/).  Students later learned how to make similar interactive webapps to this one via the [Shiny](http://shiny.rstudio.com/) extension to R/RStudio without using any HTML, javascript, CSS, etc, but rather using R and the [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html), [ggplot](http://ggplot2.org/), and [lubridate](http://cran.r-project.org/web/packages/lubridate/lubridate.pdf) packages.
