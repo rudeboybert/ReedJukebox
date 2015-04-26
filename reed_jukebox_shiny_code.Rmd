@@ -187,7 +187,7 @@ renderPlot({
     geom_smooth(se=FALSE, size=1.25) +
     scale_colour_discrete(name = "Artist") + 
     theme(text = element_text(size=20))
-}, height = 600, width = 1000 )
+}, height = 500, width = 1000 )
 ```
 
 

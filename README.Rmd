@@ -12,4 +12,4 @@ This is the code and data used for the [Reed College Jukebox Data](https://rudeb
 * `jukebox.csv`: comma separated value (CSV) format spreadsheet of songs
 * `reed_jukebox_shiny_code.Rmd`: R markdown code to create Shiny app
 
-Click "Download ZIP" on the bottom-right of the right-hand menu to obtain all necessary files.
+Click "Download ZIP" on the bottom of the right-hand menu to obtain all necessary files.
