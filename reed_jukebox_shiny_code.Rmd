@@ -19,7 +19,7 @@ suppressPackageStartupMessages(library(ggthemes))
 suppressPackageStartupMessages(library(knitr))
 
 # Load data and process dates
-jukebox <- read.csv("ReedJukebox.csv", header=TRUE, stringsAsFactors = FALSE) %>% 
+jukebox <- read.csv("reed_jukebox.csv", header=TRUE, stringsAsFactors = FALSE) %>% 
   tbl_df() %>%
   mutate(date_time = parse_date_time(date_time, "%b %d %H%M%S %Y"))
 
