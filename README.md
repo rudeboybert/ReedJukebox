@@ -2,7 +2,13 @@
 Albert Y. Kim  
 April 26, 2015  
 
-This is the code and data used for the [Reed College Jukebox Data](https://github.com/rudeboybert/ReedJukebox) webapp.  
+This is the code and data used for the [Reed College Jukebox Data](https://github.com/rudeboybert/ReedJukebox) webapp.  The files of importance are
+
+* `jukebox.csv`: comma separated value (CSV) format spreadsheet of songs
+* `reed_jukebox_shiny_code.Rmd`: R markdown code to create Shiny app
+* `README.Rmd`: R markdown code to generate this page
+
+Click "Download ZIP" on the bottom-right of this page to obtain all necessary files.  
 
 
 
@@ -10,7 +16,7 @@ This is the code and data used for the [Reed College Jukebox Data](https://githu
 
 ## The Data
 
-We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the 222,540 total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of 50 times during this time period.
+We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the 222,540 total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of 50 times during this time period.  The code to generate this webapp can be downloaded from   [GitHub](https://github.com/rudeboybert/ReedJukebox).
 
 
 
@@ -70,7 +76,7 @@ Rage Against The Machine - 02 Killing in the Name            29  Otis Redding - 
 
 **********
 
-A visualization of the comparison of the top songs played during the "Sunday Night Blues" period of 4-11pm on Sundays during the academic year vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
+Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and song plays during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
 
 * Two error bars don't overlap, a two-sample test for a difference in means/proportion would yield a statistically significant difference.
 * Two error bars do overlap, a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
@@ -90,5 +96,3 @@ The materials of the class consisted of:
 
 * A [GitHub repository](https://github.com/rudeboybert/MATH241) of all code used and most data sets (some could not be shared for confidentialily reasons) in order to foster notions of [reproducible research](https://www.coursera.org/course/repdata).  
 * Periodic slides and homework solutions on [RPubs](http://rpubs.com/rudeboybert).  All items marked "MATH 241" were relevant to this course.
-
-The code to recreate this document is in the following GitHub repository.   [https://github.com/rudeboybert/ReedJukebox](https://github.com/rudeboybert/ReedJukebox).

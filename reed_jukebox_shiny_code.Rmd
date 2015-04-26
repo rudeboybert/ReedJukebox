@@ -6,7 +6,7 @@ output: html_document
 runtime: shiny
 ---
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 # Minimum playcount an artist has to be played to appear in list of choices
 min.playcount <- 50
 
@@ -128,7 +128,7 @@ artists.list <- jukebox %>%
 
 ## The Data
 
-We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the `r prettyNum(nrow(jukebox),big.mark=",",scientific=F)` total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of `r min.playcount` times during this time period.
+We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the `r prettyNum(nrow(jukebox),big.mark=",",scientific=F)` total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of `r min.playcount` times during this time period.  The code to generate this webapp can be downloaded from   [GitHub](https://github.com/rudeboybert/ReedJukebox).
 
 
 ## Popularity of Artists
@@ -185,7 +185,8 @@ renderPlot({
     xlab("") + 
     ylab(paste("# of Times Played per ", time.text, sep="")) +
     geom_smooth(se=FALSE, size=1.25) +
-    scale_colour_discrete(name = "Artist")  
+    scale_colour_discrete(name = "Artist") + 
+    theme(text = element_text(size=20))
 }, height = 600, width = 1000 )
 ```
 
@@ -298,7 +299,7 @@ bind_cols(SNB.songs, non.SNB.songs) %>%
 
 **********
 
-A visualization of the comparison of the top songs played during the "Sunday Night Blues" period of 4-11pm on Sundays during the academic year vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
+Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and song plays during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
 
 * Two error bars don't overlap, a two-sample test for a difference in means/proportion would yield a statistically significant difference.
 * Two error bars do overlap, a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
@@ -331,7 +332,7 @@ top_ten <- bind_rows(jukebox.SNB, jukebox.non.SNB) %>%
 
 ggplot(data=top_ten, aes(x=artist, y=prop, fill=type)) + 
   geom_bar(stat="identity", position="dodge") +
-  xlab("Artist") + ylab("Proportion of Songs Played") + 
+  xlab("Artist") + ylab("Proportion of Time Played") + 
   ggtitle("Top 10 Artists for Sunday Night Blues") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_discrete(name="Type") +
@@ -348,9 +349,7 @@ This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim
 * [ggplot](http://ggplot2.org/) package for data visualization, which is an implementation of the [*Grammar of Graphics*](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448)
 * [lubridate](http://cran.r-project.org/web/packages/lubridate/lubridate.pdf) packages for date/time/time zone processing.
 
-The materials of the class consisted of:
+The materials of this class can be found at:
 
 * A [GitHub repository](https://github.com/rudeboybert/MATH241) of all code used and most data sets (some could not be shared for confidentialily reasons) in order to foster notions of [reproducible research](https://www.coursera.org/course/repdata).  
 * Periodic slides and homework solutions on [RPubs](http://rpubs.com/rudeboybert).  All items marked "MATH 241" were relevant to this course.
-
-The code to recreate this document is in the following GitHub repository.   [https://github.com/rudeboybert/ReedJukebox](https://github.com/rudeboybert/ReedJukebox).
