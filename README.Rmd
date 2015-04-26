@@ -1,5 +1,5 @@
 ---
-title: "Code and Data for Reed College Jukebox Analysis"
+title: "Code & Data for Reed Jukebox Analysis"
 author: "Albert Y. Kim"
 date: "April 26, 2015"
 output:
@@ -13,14 +13,14 @@ This is the code and data used for the [Reed College Jukebox Data](https://githu
 * `reed_jukebox_shiny_code.Rmd`: R markdown code to create Shiny app
 * `README.Rmd`: R markdown code to generate this page
 
-Click "Download ZIP" on the bottom-right of this page to obtain all necessary files.  
+Click "Download ZIP" on the bottom-right of the right-hand menu to obtain all necessary files.  
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 # Minimum playcount an artist has to be played to appear in list of choices
 min.playcount <- 50
 
-# Have the following R packages installed.
+# Have the following R packages installed
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(lubridate))

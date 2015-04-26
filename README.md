@@ -1,4 +1,4 @@
-# Code and Data for Reed College Jukebox Analysis
+# Code & Data for Reed Jukebox Analysis
 Albert Y. Kim  
 April 26, 2015  
 
@@ -8,7 +8,7 @@ This is the code and data used for the [Reed College Jukebox Data](https://githu
 * `reed_jukebox_shiny_code.Rmd`: R markdown code to create Shiny app
 * `README.Rmd`: R markdown code to generate this page
 
-Click "Download ZIP" on the bottom-right of this page to obtain all necessary files.  
+Click "Download ZIP" on the bottom-right of the right-hand menu to obtain all necessary files.  
 
 
 
