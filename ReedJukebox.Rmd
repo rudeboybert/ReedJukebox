@@ -1,0 +1,356 @@
+---
+title: "Reed College Jukebox Data"
+author: "Prof. Albert Y. Kim"
+date: "2015/04/26"
+output: html_document
+runtime: shiny
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Minimum playcount an artist has to be played to appear in list of choices
+min.playcount <- 50
+
+# Have the following R packages installed.  
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ggthemes))
+suppressPackageStartupMessages(library(knitr))
+
+# Load data and process dates
+jukebox <- read.csv("ReedJukebox.csv", header=TRUE, stringsAsFactors = FALSE) %>% 
+  tbl_df() %>%
+  mutate(date_time = parse_date_time(date_time, "%b %d %H%M%S %Y"))
+
+# Associate correct time zone: originally set to UTC
+jukebox$date_time <- with_tz(jukebox$date_time, tz = "America/Los_Angeles")
+
+# Define date to be representative of all counts during the time period
+jukebox <- jukebox %>%
+  mutate(
+    week = ceiling_date(date_time, "week"), 
+    month = ceiling_date(date_time, "month"),
+    year = ceiling_date(date_time, "year")
+  )
+
+# Clean certain artists' names:
+sigur.ros <- "Sigur Ro\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8c\x93\xa0\xbcs"
+bjork <- "Bjo\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8d\xa6\x98\xbcrk"
+blue.oyster.cult <- "Blue O\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8d\xa6\x98\xbcyster Cult"
+husker.do <- "Hu\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8d\xa6\x98\xbcsker Du\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8d\xa6\x98\xbc"
+bjork.brodsky <- "Bjo\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8d\xa6\x98\xbcrk & Brodsky Quartet"
+slagsmalsklubben <- "Slagsma\xfc\xbe\x99\x86\x94\xbc_lsklubben "
+bjork.sugarcubes <- "Bjo\xfc\xbe\x99\x86\x94\xbc\xfc\xbe\x8d\xa6\x98\xbcrk (Sugarcubes)"
+
+jukebox <- jukebox %>%
+  mutate(
+    artist = ifelse(artist == sigur.ros, "Sigor Ros", artist),
+    artist = ifelse(artist == bjork, "Bjork", artist),
+    artist = ifelse(artist == blue.oyster.cult, "Blue Oyster Cult", artist),
+    artist = ifelse(artist == husker.do, "Husker Do", artist),
+    artist = ifelse(artist == bjork.brodsky, "Bjork & Brodsky Quartet", artist),
+    artist = ifelse(artist == slagsmalsklubben, "Slagsmalsklubben", artist),
+    artist = ifelse(artist == bjork.sugarcubes, "Bjork (Sugarcubes)", artist)
+  )
+
+
+# Associated academic years to dates
+#
+# Set up sequence of every day for the given range, and
+# make a data frame out of it. we'll scan thru this to find dates that match
+# our criteria
+dates <- 
+  seq(
+    from = ymd('2003-09-01', tz = "America/Los_Angeles"), 
+    to = ymd('2009-06-30', tz = "America/Los_Angeles"),
+    by = '1 day') %>% 
+  floor_date("day") %>%
+  data.frame(dates=.)
+# First Tues in Sept:  Keep only Tuesdays in the first 7 days of the week in Sept
+first.tuesday.sept <- 
+  dates %>% 
+  filter(
+    ifelse(wday(dates)==3 & day(dates)>1 & day(dates)<=7 & month(dates)==9, 
+           TRUE, 
+           FALSE)
+  )
+# Similarly for last Mon in Jan.
+last.monday.jan <- 
+  dates %>% 
+  filter(
+    ifelse(wday(dates)==2 & day(dates)>25 & day(dates)<=31 & month(dates)==1, 
+           TRUE, 
+           FALSE)
+  )
+# Add the time corresponding to the semester
+end.acad.year <- last.monday.jan + weeks(15) + days(4)
+# Make 6 intervals at once by picking out the first column of each of the
+# following data frames.  For a data frame, you can pick out the first column by
+# using [[1]]
+acad.years <- interval(first.tuesday.sept[[1]], end.acad.year[[1]])
+
+jukebox <- jukebox %>%
+  mutate(
+    acad.year = "none",
+    acad.year = ifelse(date_time %within% acad.years[1], "2003-2004", acad.year),
+    acad.year = ifelse(date_time %within% acad.years[2], "2004-2005", acad.year),
+    acad.year = ifelse(date_time %within% acad.years[3], "2005-2006", acad.year),
+    acad.year = ifelse(date_time %within% acad.years[4], "2006-2007", acad.year),
+    acad.year = ifelse(date_time %within% acad.years[5], "2007-2008", acad.year),
+    acad.year = ifelse(date_time %within% acad.years[6], "2008-2009", acad.year)  
+  )
+
+
+# Define weekly, monthly, and yearly summarised counts and list of artists in
+# dropdown menu.
+jukebox.weekly <- jukebox %>%
+  group_by(week, artist, track) %>%
+  summarise(count = n())
+
+jukebox.monthly <- jukebox %>%
+  group_by(month, artist, track) %>%
+  summarise(count = n())
+
+jukebox.yearly <- jukebox %>%
+  group_by(year, artist, track) %>%
+  summarise(count = n())
+
+# All artists sorted.
+artists.list <- jukebox %>% 
+  group_by(artist) %>%
+  summarise(count=n()) %>%
+  arrange(desc(count)) %>%
+  filter(count >= min.playcount) %>%
+  arrange(artist) %>% .[["artist"]]
+```
+
+
+## The Data
+
+We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the `r prettyNum(nrow(jukebox),big.mark=",",scientific=F)` total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of `r min.playcount` times during this time period.
+
+
+## Popularity of Artists
+
+Please
+
+* Select from the dropdown menu, type in, or delete the desired artists
+* Select for what time unit you want play counts for
+
+The thin lines represent the raw play counts per time unit, while the thicker line corresponds to a moving average to separate the signal from the noise.  
+
+```{r, echo=FALSE}
+# Input parameters.
+inputPanel(
+  selectInput("artists", label = "Artists:",
+              choices = artists.list, 
+              selected = c("Girl Talk", "Eminem", "Talking Heads"),
+              multiple = TRUE),
+  selectInput("time.res", label = "Select Time Units:",
+              choices = c("Weekly", "Monthly", "Yearly"),
+              selected = "Monthly")
+)
+
+renderPlot({
+  artists <- input$artists
+  time.res <- input$time.res
+
+  if(time.res == "Weekly") {
+    jukebox.sub <- jukebox.weekly %>%
+      filter(artist %in% artists) %>%
+      group_by(week, artist) %>%
+      rename(time=week) %>%
+      summarise(count=sum(count))
+    time.text <- "Week"
+  } else if(time.res == "Monthly") {
+    jukebox.sub <- jukebox.monthly %>%
+      filter(artist %in% artists)  %>%
+      group_by(month, artist) %>%
+      rename(time=month) %>%
+      summarise(count=sum(count))
+    time.text <- "Month"
+  } else if(time.res == "Yearly") {
+    jukebox.sub <- jukebox.yearly %>%
+      filter(artist %in% artists)  %>%
+      group_by(year, artist) %>%
+      rename(time=year) %>%
+      summarise(count=sum(count))
+    time.text <- "Year"
+  }
+  
+  # We make the actual time series a little fainter
+  ggplot(data=jukebox.sub, aes(x=time, y=count, col=artist)) + 
+    geom_line(alpha=0.5) + 
+    xlab("") + 
+    ylab(paste("# of Times Played per ", time.text, sep="")) +
+    geom_smooth(se=FALSE, size=1.25) +
+    scale_colour_discrete(name = "Artist")  
+}, height = 600, width = 1000 )
+```
+
+
+
+
+## Other Summaries and Visualizations
+
+Hourly play count of songs across the entire time period (Economist theme uncovered by Rennie Meyers):
+
+```{r, echo=FALSE}
+jukebox %>% 
+  mutate(hour=hour(date_time)) %>%
+  group_by(hour) %>%
+  summarise(count=n()) %>%
+  ggplot(data=., aes(x=hour, y=count)) + 
+  geom_bar(stat="identity") +
+  xlab("Hour of day") + 
+  ylab("# of Songs Played per Hour") +
+  ggtitle("Hourly Play Count") +
+  theme_economist()
+```
+
+**********
+
+Time series of number of songs played per week:
+
+```{r, echo=FALSE}
+group_by(jukebox, week) %>%
+  summarise(count=n()) %>%
+  ggplot(data=., aes(x=week, y=count)) + geom_line() + 
+  xlab("") + 
+  ylab("# of Songs Played per Week") +
+  ggtitle("Weekly Play Count") +
+  theme_economist()
+```
+
+**********
+
+Top ten artists for each academic year (table formatting c/o Emmeline Hill, Jossef Osborn, and Eleanor Parmentier).  Note we define the academic year to be the period in between 
+
+* The first Tuesday in September 
+* The last Monday in January plus 15 weeks and 4 days
+
+
+```{r, echo=FALSE}
+# Number of top artists to display:
+num <- 10
+
+# Get top artists by year. Note we
+# -group_by(acad.year) so that the arrange command sorts the number of times
+#  each artist is played within each academic year
+# -Skim off the top_n()
+# -We ungroup() to break the group structure.  If we leave the group structure
+#  then anytime we print the table, it will include group structure information
+#  which will clutter up our tables.  
+top.artists <- filter(jukebox, acad.year != "none") %>% 
+  count(acad.year, artist) %>% 
+  group_by(acad.year) %>%
+  arrange(desc(n)) %>% 
+  slice(1:num) %>%
+  ungroup()
+
+# Pull out for each academic year
+three.four <- filter(top.artists, acad.year=="2003-2004") %>% select(artist) %>% 
+  rename(`2003-2004`=artist)
+four.five <- filter(top.artists, acad.year=="2004-2005") %>% select(artist) %>% 
+  rename(`2004-2005`=artist)
+five.six <- filter(top.artists, acad.year=="2005-2006") %>% select(artist) %>% 
+  rename(`2005-2006`=artist)
+six.seven <- filter(top.artists, acad.year=="2006-2007") %>% select(artist) %>% 
+  rename(`2006-2007`=artist)
+seven.eight <- filter(top.artists, acad.year=="2007-2008") %>% select(artist) %>% 
+  rename(`2007-2008`=artist)
+eight.nine <- filter(top.artists, acad.year=="2008-2009") %>% select(artist) %>% 
+  rename(`2008-2009`=artist)
+
+# Combine all into one data frame
+bind_cols(
+  data.frame(Rank=1:num), three.four, four.five, five.six, six.seven, 
+  seven.eight, eight.nine
+  ) %>%
+  kable()
+```
+
+**********
+
+A table of the top songs played during the "Sunday Night Blues" period of 4-11pm on Sundays during the academic year:
+
+```{r, echo=FALSE}
+SNB.songs <- filter(jukebox, acad.year != "none") %>%
+  filter(wday(date_time) == 1 & hour(date_time) >= 4 & hour(date_time) < 23) %>%
+  mutate(`SNB Artist/Track` = paste(artist, track, sep=" - ")) %>%
+  group_by(`SNB Artist/Track`) %>%
+  summarise(`SNB Count`=n()) %>%
+  arrange(desc(`SNB Count`)) %>%
+  slice(1:10) 
+
+non.SNB.songs <- filter(jukebox, acad.year != "none") %>%
+  filter(!(wday(date_time) == 1 & hour(date_time) >= 4 & hour(date_time) < 23)) %>%
+  mutate(`Non-SNB Artist/Track` = paste(artist, track, sep=" - ")) %>%
+  group_by(`Non-SNB Artist/Track`) %>%
+  summarise(`Non-SNB Count`=n()) %>%
+  arrange(desc(`Non-SNB Count`)) %>%
+  slice(1:10) 
+
+bind_cols(SNB.songs, non.SNB.songs) %>%
+  kable()
+```
+
+**********
+
+A visualization of the comparison of the top songs played during the "Sunday Night Blues" period of 4-11pm on Sundays during the academic year vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
+
+* Two error bars don't overlap, a two-sample test for a difference in means/proportion would yield a statistically significant difference.
+* Two error bars do overlap, a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=6}
+jukebox.SNB <- filter(jukebox, acad.year != "none") %>%
+  filter(wday(date_time) == 1 & hour(date_time) >= 4 & hour(date_time) < 23) %>%
+  count(artist) %>% 
+  top_n(10, n) %>% 
+  arrange(n) %>%
+  mutate(
+    prop = n/sum(n), 
+    se = sqrt(prop*(1-prop)/sum(n)), 
+    type="SNB"
+    )
+
+jukebox.non.SNB <- filter(jukebox, acad.year != "none") %>%
+  filter(!(wday(date_time) == 1 & hour(date_time) >= 4 & hour(date_time) < 23)) %>%
+  count(artist) %>%
+  # only keep those artists that are in the SNB top 10
+  filter(artist %in% jukebox.SNB$artist) %>%
+    mutate(
+    prop = n/sum(n), 
+    se = sqrt(prop*(1-prop)/sum(n)), 
+    type="Non-SNB"
+    )
+
+top_ten <- bind_rows(jukebox.SNB, jukebox.non.SNB) %>%
+  mutate(artist = reorder(artist, prop, mean))
+
+ggplot(data=top_ten, aes(x=artist, y=prop, fill=type)) + 
+  geom_bar(stat="identity", position="dodge") +
+  xlab("Artist") + ylab("Proportion of Songs Played") + 
+  ggtitle("Top 10 Artists for Sunday Night Blues") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_discrete(name="Type") +
+  geom_errorbar(aes(ymax = prop + 1.96*se, ymin= prop - 1.96*se), 
+                col="black", position="dodge")
+```
+
+
+## Background and Information
+
+This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim/) [MATH 241 Case Studies in Statistical Analysis](http://people.reed.edu/~albkim/MATH241/) AKA Data Science class.  Students created all visualizations and conducted all analysis using the open source [R statistical language and environment](http://cran.r-project.org/) via the [RStudio interface](http://www.rstudio.com/).  Students later learned how to make similar interactive webapps to this one via the [Shiny](http://shiny.rstudio.com/) extension to R/RStudio without using any HTML, javascript, CSS, etc, but rather using R and the following packages (extensions to base R):
+
+* [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package for data manipulation
+* [ggplot](http://ggplot2.org/) package for data visualization, which is an implementation of the [*Grammar of Graphics*](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448)
+* [lubridate](http://cran.r-project.org/web/packages/lubridate/lubridate.pdf) packages for date/time/time zone processing.
+
+The materials of the class consisted of:
+
+* A [GitHub repository](https://github.com/rudeboybert/MATH241) of all code used and most data sets (some could not be shared for confidentialily reasons) in order to foster notions of [reproducible research](https://www.coursera.org/course/repdata).  
+* Periodic slides and homework solutions on [RPubs](http://rpubs.com/rudeboybert).  All items marked "MATH 241" were relevant to this course.
+
+The code to recreate this document is in the following GitHub repository.   [https://github.com/rudeboybert/ReedJukebox](https://github.com/rudeboybert/ReedJukebox).
