@@ -14,9 +14,9 @@ min.playcount <- 50
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(lubridate))
-suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ggthemes))
 suppressPackageStartupMessages(library(knitr))
+
 
 # Load data and process dates
 jukebox <- read.csv("reed_jukebox.csv", header=TRUE, stringsAsFactors = FALSE) %>% 
@@ -128,7 +128,7 @@ artists.list <- jukebox %>%
 
 ## The Data
 
-We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the `r prettyNum(nrow(jukebox),big.mark=",",scientific=F)` total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of `r min.playcount` times during this time period.  The code to generate this webapp can be downloaded from   [GitHub](https://github.com/rudeboybert/ReedJukebox).
+We present summaries of all artists played on the Reed College jukebox located in the pool room of the Commons building between November 30th, 2003 and January 22nd, 2009.  The data was generously provided by [Noah Pepper '09](http://www.noahpepper.com/).  The dataset consisted of information on the `r prettyNum(nrow(jukebox),big.mark=",",scientific=F)` total songs played.  We only present an artist in the drop-down list of artists if they were played a minimum of `r min.playcount` times during this time period.  The original data and the code to generate this webapp can be downloaded from   [GitHub](https://github.com/rudeboybert/ReedJukebox).
 
 
 ## Popularity of Artists
@@ -193,11 +193,13 @@ renderPlot({
 
 
 
+
+
 ## Other Summaries and Visualizations
 
 Hourly play count of songs across the entire time period (Economist theme uncovered by Rennie Meyers):
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 jukebox %>% 
   mutate(hour=hour(date_time)) %>%
   group_by(hour) %>%
@@ -214,7 +216,7 @@ jukebox %>%
 
 Time series of number of songs played per week:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 group_by(jukebox, week) %>%
   summarise(count=n()) %>%
   ggplot(data=., aes(x=week, y=count)) + geom_line() + 
@@ -232,7 +234,7 @@ Top ten artists for each academic year (table formatting c/o Emmeline Hill, Joss
 * The last Monday in January plus 15 weeks and 4 days
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 # Number of top artists to display:
 num <- 10
 
@@ -276,7 +278,7 @@ bind_cols(
 
 A table of the top songs played during the "Sunday Night Blues" period of 4-11pm on Sundays during the academic year:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 SNB.songs <- filter(jukebox, acad.year != "none") %>%
   filter(wday(date_time) == 1 & hour(date_time) >= 4 & hour(date_time) < 23) %>%
   mutate(`SNB Artist/Track` = paste(artist, track, sep=" - ")) %>%
@@ -299,12 +301,12 @@ bind_cols(SNB.songs, non.SNB.songs) %>%
 
 **********
 
-Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and song plays during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (Code c/o Dean Young).  Note that if 
+Limiting consideration to the top 10 artists played during the "Sunday Night Blues" period and song plays during the academic year, we compare the proportion of time these artists were played during the "Sunday Night Blues" period of 4-11pm on Sundays vs 4-11pm on all other days of the week, along with 95% confidence bands (code c/o Dean Young).  Note that if 
 
 * Two error bars don't overlap, a two-sample test for a difference in means/proportion would yield a statistically significant difference.
 * Two error bars do overlap, a two-sample test for a difference in means/proportion **may** still yield a statistically significant difference.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=6}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.width=10, fig.height=6}
 jukebox.SNB <- filter(jukebox, acad.year != "none") %>%
   filter(wday(date_time) == 1 & hour(date_time) >= 4 & hour(date_time) < 23) %>%
   count(artist) %>% 
@@ -343,13 +345,13 @@ ggplot(data=top_ten, aes(x=artist, y=prop, fill=type)) +
 
 ## Background and Information
 
-This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim/) [MATH 241 Case Studies in Statistical Analysis](http://people.reed.edu/~albkim/MATH241/) AKA Data Science class.  Students created all visualizations and conducted all analysis using the open source [R statistical language and environment](http://cran.r-project.org/) via the [RStudio interface](http://www.rstudio.com/).  Students later learned how to make similar interactive webapps to this one via the [Shiny](http://shiny.rstudio.com/) extension to R/RStudio without using any HTML, javascript, CSS, etc, but rather using R and the following packages (extensions to base R):
+This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim/) [MATH 241 Data Science](http://people.reed.edu/~albkim/MATH241/) class.  Students created all visualizations and conducted all analysis using the open source [R statistical language and environment](http://cran.r-project.org/) via the [RStudio interface](http://www.rstudio.com/).  Students later learned how to make similar interactive webapps to this one via the [Shiny](http://shiny.rstudio.com/) extension to R/RStudio without using any HTML, javascript, CSS, etc, but rather using R and the following packages (extensions to base R):
 
 * [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) package for data manipulation
-* [ggplot](http://ggplot2.org/) package for data visualization, which is an implementation of the [*Grammar of Graphics*](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448)
+* [ggplot](http://ggplot2.org/) package for data visualization, which is an implementation of [*The Grammar of Graphics*](http://www.amazon.com/The-Grammar-Graphics-Statistics-Computing/dp/0387245448)
 * [lubridate](http://cran.r-project.org/web/packages/lubridate/lubridate.pdf) packages for date/time/time zone processing.
 
-The materials of this class can be found at:
+The materials from this class can be found at:
 
-* A [GitHub repository](https://github.com/rudeboybert/MATH241) of all code used and most data sets (some could not be shared for confidentialily reasons) in order to foster notions of [reproducible research](https://www.coursera.org/course/repdata).  
+* A [GitHub repository](https://github.com/rudeboybert/MATH241) of all code used and most data sets (some could not be shared for confidentialily reasons).  
 * Periodic slides and homework solutions on [RPubs](http://rpubs.com/rudeboybert).  All items marked "MATH 241" were relevant to this course.
