@@ -346,3 +346,5 @@ ggplot(data=top_ten, aes(x=artist, y=prop, fill=type)) +
 ## Background and Information
 
 This was an assignment in [Prof. Albert Y. Kim's](http://people.reed.edu/~albkim/) [MATH 241 Data Science](http://people.reed.edu/~albkim/MATH241/) class.  Students created all visualizations and conducted all analysis using the open source [R statistical language and environment](http://cran.r-project.org/) via the [RStudio interface](http://www.rstudio.com/).  Students later learned how to make similar interactive webapps to this one via the [Shiny](http://shiny.rstudio.com/) extension to R/RStudio without using any HTML, javascript, CSS, etc, but rather using R and the [dplyr](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html), [ggplot](http://ggplot2.org/), and [lubridate](http://cran.r-project.org/web/packages/lubridate/lubridate.pdf) packages.
+
+
